@@ -1,0 +1,2 @@
+pyinstaller Server.py
+pause

@@ -1,0 +1,2 @@
+pyinstaller box.spec
+pause

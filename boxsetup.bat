@@ -1,0 +1,2 @@
+pyinstaller box.py
+pause
