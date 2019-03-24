@@ -1,2 +1,2 @@
-pyinstaller box.spec
+pyinstaller --icon=box.ico box.spec
 pause

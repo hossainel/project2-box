@@ -110,7 +110,7 @@ class Window(QDialog):
 
                         l = 'Server Running' + '\nIP: <' + self.ip + '>\nPort: <' + str(self.port) + '>\npassword: <' + self.password + '>\n' + response
                         self.TrayIconFun.setToolTip(l)
-                        self.showMessage(response)
+                        # self.showMessage(response)
         
                     elif '**help' in msg:
                         client.send(self.help.encode(self.dtyp))
@@ -123,7 +123,7 @@ class Window(QDialog):
                     elif '**file' in msg:
                         #sending files
                         #recv filenames sender name = nx file size = sx
-                        fileName, nx, sx = msg[6:].split('!@!@!')
+                        _, nx, sx = msg[6:].split('!@!@!')
                         #sending file name by msg
                         for k, v in self.clients.items():
                             if k == nx: pass
@@ -202,14 +202,17 @@ class Window(QDialog):
 
         while self.serverRunning:
             client, address = self.s.accept()
-            uname, password, _ = client.recv(self.datasize).decode(self.dtyp).split('!@!@!')
+            try: uname, password, _ = client.recv(self.datasize).decode(self.dtyp).split('!@!@!')
+            except: password = 'Unauthorizesd entrys'; uname = 'Security is at risk.'
             #password = client.recv(self.datasize).decode(self.dtyp)
             namesx = self.clients.keys()
             for i in namesx:
                 if i == uname: uname = uname + 's'
-            print(uname, password)
-            print(self.password)
+            # print(uname, password)
+            # print('client: ', client, 'address: ', address)
+            # print('Pass: '+self.password)
             if password == self.password:
+                self.showMessage(uname+' has logged in.')
                 print("%s connected to the server..." % str(uname))
                 #next here will be added a welcome msg
                 welcomeMsg = "ROOT>>" + self.welcomeM + '!@!@!' + uname
@@ -220,8 +223,12 @@ class Window(QDialog):
                     self.clients[uname] = client
                     threading.Thread(target = handleClient, args = (client, uname, )).start()
             else:
+                with open('recieved/unauthorized.txt', 'a+') as fux: fux.write(str(address)+'\n')
+                fux.close()
+                #lxs = "Your IP Address: " + str(address[0]) +':'+ str(address[1]) + " is not Valid."
+                self.showMessage('Unauthorized Entry.\nClient terminated.\n'+uname+'\nIP>>'+str(address[0]) +':'+ str(address[1]))
                 print(uname, '>>client terminated') 
-                client.send("Worng Passowrd!".encode(self.dtyp))
+                #client.send(lxs.encode(self.dtyp))
                 #client.close()
 
     def ppFun(self):
